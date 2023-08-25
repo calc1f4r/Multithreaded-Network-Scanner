@@ -8,10 +8,10 @@ The Network Scanner Tool is a versatile utility written in Python that utilizes 
 
 #### Features
 
-ARP Ping Scan 🌐: Discover active hosts and their corresponding MAC addresses on the network.
-TCP Port Scan 🛠️: Identify open TCP ports on a target host using multithreading for accelerated scanning.
-UDP Port Scan 🛰️: Identify open UDP ports on a target host using multithreading for swifter scanning.
-Customizable Port Range and Threads ⚙️: Tailor your scans with adjustable port ranges and thread counts
+- ARP Ping Scan 🌐: Discover active hosts and their corresponding MAC addresses on the network.
+- TCP Port Scan 🛠️: Identify open TCP ports on a target host using multithreading for accelerated scanning.
+- UDP Port Scan 🛰️: Identify open UDP ports on a target host using multithreading for swifter scanning.
+- Customizable Port Range and Threads ⚙️: Tailor your scans with adjustable port ranges and thread counts
 
 #### Installation
 
