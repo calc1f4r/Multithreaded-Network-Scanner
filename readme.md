@@ -1,6 +1,10 @@
 ## 🌐 Network Scanner Tool
 
-The Network Scanner Tool 🛠️ is a command-line utility that empowers you to perform various types of network scans, including ARP ping, TCP port scanning, and UDP port scanning. This tool is designed to help you unveil information about devices and their ports within a given network. 🌐🔍
+The Network Scanner Tool 🛠️ is a command-line utility that enables you to perform various network scans, including ARP ping, TCP port scanning, and UDP port scanning. This tool is designed to help you unveil information about devices and their ports within a given network. 🌐🔍
+
+https://github.com/calc1f4r/Multithreaded-Network-Scanner/assets/74751675/cc9e9f1e-90a7-4446-adba-29d30736d93c
+
+
 
 ### Introduction
 
@@ -50,13 +54,13 @@ target: Target URL or IP address (required).
 python network_scanner.py 192.168.1.0/24 -arp
 ```
 
-2.Perform a TCP port scan on a target IP address with a custom port range and 50 threads:
+2. Perform a TCP port scan on a target IP address with a custom port range and 50 threads:
 
 ```python
 python network_scanner.py 192.168.1.100 -pT -p 1-100 -t 50
 ```
 
-3.Perform a UDP port scan on a target IP address with default port range and 75 threads:
+3. Perform a UDP port scan on a target IP address with a default port range and 75 threads:
 
 ```python
 python network_scanner.py 10.0.0.1 -pU -t 75
