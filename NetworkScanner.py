@@ -1,15 +1,12 @@
+from datetime import datetime
 import argparse
 import socket
 import re
 import concurrent.futures
-import logging
 from queue import Queue
 import queue
 import scapy.all as scapy
-
-logging.basicConfig(level=logging.INFO, format="%(message)s")
-
-
+from  termcolor import colored
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("target", help="Target URL or IP address")
@@ -55,11 +52,9 @@ def get_args():
     )
     return parser.parse_args()
 
-
 def arp_ping(ip):
     if not re.match(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]*$", ip):
-        logging.error(
-            "[-] Please provide a valid IP address range for ARP ping!")
+        print(colored("[-] Please provide a valid IP address range for ARP ping!",'red',attrs=['bold']))
         exit(1)
 
     try:
@@ -67,13 +62,12 @@ def arp_ping(ip):
         ether_broadcast_frame = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
         broadcast_arp_packet = ether_broadcast_frame / arp_request_frame
         active_clients = scapy.srp(
-            broadcast_arp_packet, timeout=3, verbose=False)[0]
-        logging.info("IP address\tMac address")
+        broadcast_arp_packet, timeout=3, verbose=False)[0]
+        
         for _, reply in active_clients:
-            logging.info(f"{reply.psrc}\t{reply.hwsrc}")
+            print(f"[+]\t{reply.psrc}\t{reply.hwsrc}")
     except Exception as err:
-        logging.error(f"[-] Error occurred! Reason: {err}")
-
+        print(colored(f"[-] Error occurred! Reason: {err}",'red',attrs=['dark']))
 
 def port_scan(port, host, scan_type):
     try:
@@ -82,19 +76,18 @@ def port_scan(port, host, scan_type):
             client.settimeout(1)
             client.connect((host, port))
             client.close()
-            logging.info(f"{port}\tOpen")
+            print(f"[*]\t{port}\tOpen")
         elif scan_type == "U":
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             sock.settimeout(1)
             client.connect((host, port))
-            logging.info(f"{port}\tOpen")
+            print(f"[*]\t{port}\tOpen")
             sock.close()
     except KeyboardInterrupt:
-        logging.error("You pressed Ctrl+C")
+        print("You pressed Ctrl+C")
         exit(1)
     except:
         pass
-
 
 def scan_thread(host, scan_type, port_queue):
     while True:
@@ -105,28 +98,41 @@ def scan_thread(host, scan_type, port_queue):
         except queue.Empty:
             break
 
-
 def main():
     args = get_args()
     host = args.target
     start_port, end_port = map(int, args.ports.split("-"))
     scan_type = ""
     port_queue = Queue()
-
+    print(colored("-"*65, 'cyan', attrs=['dark']))
+    print(colored(
+            f"\tNetwork scanner starting at {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}", 'cyan', attrs=['dark']))
+    print(colored("-"*65, 'cyan', attrs=['dark']))
     if args.arp:
-        logging.info(
-            "\n----------------------------------------\n\tARP Ping Scan Results \n-----------------------------------------"
-        )
+        print(colored("-"*50,'light_red'))
+        print(colored("\tARP Ping Scan Results",'light_red'))
+        print(colored("-"*50,'light_red'))
+        print(colored("="*30,'black'))
+        print(colored("\tPort\tState",'black',attrs=['bold']))
+        print(colored("="*30,'black'))
         arp_ping(host)
 
-    if args.tcpPortScan:
-        logging.info(
-            "\n----------------------------------------\n\tTCP Port Scan Results \n-----------------------------------------"
-        )
-        logging.info(
-            "---------------------------\nPort\tState\n---------------------------"
-        )
-        scan_type = "T"
+    if ((args.tcpPortScan)or(args.udpPortScan)):
+        print(colored("-"*50,'light_red'))
+        if args.tcpPortScan:
+            print(colored("\tTCP Port Scan Results",'light_red'))
+            scan_type="T"
+        elif (args.udpPortScan):
+            print(colored("\tUDP Port Scan Results",'light_red'))
+            scan_type="U"
+        print(colored("-"*50,'light_red'))
+        print()
+        print(colored("="*30,'dark_grey'))
+        print(colored("\tPort\tState",'dark_grey',attrs=['bold']))
+        print(colored("="*30,'dark_grey'))
+        
+        
+        
         for port in range(start_port, end_port + 1):
             port_queue.put(port)
         with concurrent.futures.ThreadPoolExecutor(
@@ -135,24 +141,6 @@ def main():
             for _ in range(args.threads):
                 executor.submit(scan_thread, host, scan_type, port_queue)
         port_queue.join()
-
-    if args.udpPortScan:
-        logging.info(
-            "\n----------------------------------------\n\tUDP Port Scan Results \n-----------------------------------------"
-        )
-        logging.info(
-            "---------------------------\nPort\tState\n---------------------------"
-        )
-        scan_type = "U"
-        for port in range(start_port, end_port + 1):
-            port_queue.put(port)
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=args.threads
-        ) as executor:
-            for _ in range(args.threads):
-                executor.submit(scan_thread, host, scan_type, port_queue)
-        port_queue.join()
-
 
 if __name__ == "__main__":
     main()
