@@ -4,8 +4,7 @@ import socket
 import re
 import concurrent.futures
 from queue import Queue
-import queue
-import scapy.all as scapy
+import scapy.all as scapy]
 from  termcolor import colored
 def get_args():
     parser = argparse.ArgumentParser()
@@ -144,3 +143,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
